@@ -1,0 +1,8 @@
+/config/*
+
+/venv/*
+
+__pycache__/
+*.py[cod]
+
+**__init__.py
