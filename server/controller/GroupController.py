@@ -11,7 +11,6 @@ class GroupController:
 
         dao = GroupsDAO()
         groupid = dao.addNewGroup(userid, groupname, department, isresearch)
-        emailverificaton = "TODO: send email verification to user"
         result = groupid
         return jsonify(result), 201
 
@@ -27,13 +26,12 @@ class GroupController:
     def getSpecificGroup(self, groupid):
         dao = GroupsDAO()
         group = dao.getSpecificGroup(groupid)
-        return jsonify(group)
+        return jsonify(self.build_group_map_to_dict(group))
 
     def build_group_map_to_dict(self, row):
-        result = {}
+        result = {} # groupid, groupname, department, isresearch
         result['groupid'] = row[0]
-        result['userid'] = row[1]
-        result['groupname'] = row[2]
-        result['department'] = row[3]
-        result['isresearch'] = row[4]
+        result['groupname'] = row[1]
+        result['department'] = row[2]
+        result['isresearch'] = row[3]
         return result

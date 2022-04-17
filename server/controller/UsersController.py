@@ -31,6 +31,13 @@ class UserController:
             result_list.append(obj)
         return jsonify(result_list)
 
+    def loginUser(json):
+        dao = UsersDAO()
+        email = json['email']
+        password = json['password']
+        userid = dao.loginUser(email, password)
+        return jsonify(userid), 200
+
     def updateUser(self, userid, json):
         email = json['email']
         password = json['password']
@@ -41,7 +48,7 @@ class UserController:
         dao = UsersDAO()
         dao.updateUser(userid, first_name, last_name, email, password, role, isValidated)
         user_result = self.build_user_attr_dict(userid, first_name, last_name, email, password, role, isValidated)
-        return jsonify(user_result), 204
+        return jsonify(user_result), 200
 
     def build_user_map_to_dict(self, row):
         result = {}

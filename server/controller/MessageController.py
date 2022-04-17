@@ -29,7 +29,7 @@ class MessageController:
     def getSpecificMessage(self, messageid):
         dao = MessageDAO()
         result = dao.getSpecificMessage(messageid)
-        return jsonify(result)
+        return jsonify(self.build_message_map_to_dict(result))
 
     def getAllMessages(self):
         dao = MessageDAO()

@@ -35,7 +35,5 @@ class GroupsDAO:
         cursor = self.conn.cursor()
         query = "SELECT groupid, groupname, department, isresearch FROM research_group WHERE groupid=%s;" % (groupid)
         cursor.execute(query)
-        result = []
-        for row in cursor:
-            result.append(row)
+        result = cursor.fetchone()
         return result
