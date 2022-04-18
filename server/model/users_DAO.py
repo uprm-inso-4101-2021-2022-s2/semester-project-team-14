@@ -1,6 +1,6 @@
 from config.dbconfig import pg_config
 import psycopg2
-
+from werkzeug.security import generate_password_hash, check_password_hash
 class UsersDAO:
 
     def __init__(self):
@@ -33,7 +33,17 @@ class UsersDAO:
 
     def loginUser(self, email, password):
         # TODO: Compare passwords
-        return
+        print("Comparing passwords")
+        cursor = self.conn.cursor()
+        query = "SELECT * FROM users where email=%s;" 
+        cursor.execute(query, (email,))
+        print("Got response")
+        for row in cursor:
+            if(cursor and check_password_hash(row[4], password)):
+                return "User authenticated"
+            else:
+                return "Wrong Password"
+        return "Couldn't be authenticated"
 
     def getSpecificUser(self, userid):
         cursor = self.conn.cursor()

@@ -108,9 +108,9 @@ def registerGroup():
 def loginUser():
     if request.method == "POST":
         try:
-            return UserController().loginUser(request.json)
-            # TODO: login user
-            pass
+            input_json = request.json
+            response = UserController().loginUser(input_json)
+            return response
         except:
             return jsonify(Error="Login was not allowed"), 400
     else:
