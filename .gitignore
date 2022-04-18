@@ -2,6 +2,10 @@
 
 /venv/*
 
+/.venv/
+
+/RUMCircle/
+
 __pycache__/
 *.py[cod]
 
