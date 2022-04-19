@@ -1,6 +1,6 @@
 import sys
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 from server.controller.MessageController import MessageController
 from server.controller.UsersController import UserController
@@ -8,9 +8,25 @@ from server.controller.GroupController import GroupController
 from server.controller.StudentController import StudentController
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'testkey'
+app.config['CORS_HEADERS'] = 'Content-Type'
+cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-CORS(app)  # apply CORS
 
+# This route:
+# 1. Logs in the specific user with userid (POST)
+@app.route('/api/login', methods=['POST'])
+@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
+def loginUser():
+    if request.method == "POST":
+        try:
+            input_json = request.json
+            response = UserController().loginUser(input_json)
+            return response
+        except:
+            return jsonify(Error="Login was not allowed"), 400
+    else:
+        return jsonify(Error="Method not allowed"), 405
 
 # This route:
 # 1. Lists all users in the system (GET)
@@ -102,19 +118,6 @@ def registerGroup():
     else:
         return jsonify(Error="Method not allowed"), 405
 
-# This route:
-# 1. Logs in the specific user with userid (POST)
-@app.route('/api/login', methods=['POST'])
-def loginUser():
-    if request.method == "POST":
-        try:
-            input_json = request.json
-            response = UserController().loginUser(input_json)
-            return response
-        except:
-            return jsonify(Error="Login was not allowed"), 400
-    else:
-        return jsonify(Error="Method not allowed"), 405
 
 # This route:
 # 1. Student follows Group (POST)

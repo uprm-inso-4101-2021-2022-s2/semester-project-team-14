@@ -4,6 +4,8 @@
 
 /.venv/
 
+/node_modules/
+
 /RUMCircle/
 
 __pycache__/
