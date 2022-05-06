@@ -40,7 +40,7 @@ class UserController:
         password = json['password']
         print(password)
         userid = dao.loginUser(email, password)
-        if userid != 'User authenticated': return userid, 400
+        if userid != 'User authenticated': return userid, 404
         return userid, 200
 
     def updateUser(self, userid, json):
