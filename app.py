@@ -68,13 +68,13 @@ def registerGroup():
 
 # This route:
 # 1. Logs in the specific user with userid (POST)
-@app.route('/api/login/<int:userid>', methods=['POST'])
-def loginUser(userid):
+@app.route('/api/login', methods=['POST'])
+def loginUser():
     if request.method == "POST":
         try:
-            #return UserController().loginUser(userid)
-            # TODO: login user
-            pass
+            input_json = request.json
+            response = UserController().loginUser(input_json)
+            return response
         except:
             return jsonify(Error="Login was not allowed"), 400
     else:
