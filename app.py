@@ -1,5 +1,6 @@
+import sys
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 from server.controller.MessageController import MessageController
 from server.controller.UsersController import UserController
@@ -7,9 +8,26 @@ from server.controller.GroupController import GroupController
 from server.controller.StudentController import StudentController
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'testkey'
+app.config['CORS_HEADERS'] = 'Content-Type'
+cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-CORS(app)  # apply CORS
 
+# This route:
+# 1. Logs in the specific user with userid (POST)
+@app.route('/api/login', methods=['POST'])
+@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
+def loginUser():
+    if request.method == "POST":
+        try:
+            input_json = request.json
+            response = UserController().loginUser(input_json)
+            print(response)
+            return response
+        except:
+            return jsonify(Error="Login was not allowed"), 400
+    else:
+        return jsonify(Error="Method not allowed"), 405
 
 # This route:
 # 1. Lists all users in the system (GET)
@@ -24,13 +42,48 @@ def handle_user():
 # This route does three things
 # 1. Lists all users in the system (GET)
 # 2. Update a users to the system (PUT)
-# 3. Delete user with userid uid
-@app.route('/api/users/<int:userid>', methods=['GET', 'PUT', 'DELETE'])
-def handleUserById(uid):
+@app.route('/api/users/<int:userid>', methods=['GET', 'PUT'])
+def handleUserById(userid):
     if request.method == 'GET':
-        return UserController().getSpecificUser(uid)
+        return UserController().getSpecificUser(userid)
     elif  request.method == 'PUT':
-        return UserController().updateUser(uid, request.json)
+        return UserController().updateUser(userid, request.json)
+    else:
+        return jsonify("Method Not Allowed"), 405
+
+# This route:
+# 1. Lists all groups in the system (GET)
+@app.route('/api/groups', methods=['GET'])
+def handle_all_groups():
+    if request.method == "GET":
+        return GroupController().getAllGroups()
+    else:
+        return jsonify("Method Not Allowed"), 405
+
+# This route:
+# 1. Lists group in the system with id groupid (GET)
+@app.route('/api/groups/<int:groupid>', methods=['GET'])
+def handle_specific_group(groupid):
+    if request.method == "GET":
+        return GroupController().getSpecificGroup(groupid)
+    else:
+        return jsonify("Method Not Allowed"), 405
+
+# This route:
+# 1. Lists all students in the system (GET)
+@app.route('/api/students', methods=['GET'])
+def handle_all_students():
+    if request.method == "GET":
+        return StudentController().getAllStudents()
+    else:
+        return jsonify("Method Not Allowed"), 405
+
+# This route:
+# 1. Lists student in the system with id studentid (GET)
+@app.route('/api/students/<int:studentid>', methods=['GET'])
+def handle_specific_student(studentid):
+    if request.method == "GET":
+        return StudentController().getSpecificStudents(studentid)
     else:
         return jsonify("Method Not Allowed"), 405
 
@@ -39,13 +92,13 @@ def handleUserById(uid):
 # -------------- Register/Login Actions --------------
 # This route:
 # 1. Registers a new student (POST)
-@app.route('/api/register/student/', methods=['POST'])
+@app.route('/api/register/student', methods=['POST'])
 def registerStudent():
     if request.method == "POST":
         try:
             role = "student"
             userid = UserController().addNewUser(request.json, role)
-            StudentController().addNewStudent(request.json, userid)
+            return StudentController().addNewStudent(request.json, userid)
         except:
             return jsonify(Error="POST was unsuccessful"), 500
     else:
@@ -66,46 +119,31 @@ def registerGroup():
     else:
         return jsonify(Error="Method not allowed"), 405
 
-# This route:
-# 1. Logs in the specific user with userid (POST)
-@app.route('/api/login', methods=['POST'])
-def loginUser():
-    if request.method == "POST":
-        try:
-            input_json = request.json
-            response = UserController().loginUser(input_json)
-            return response
-        except:
-            return jsonify(Error="Login was not allowed"), 400
-    else:
-        return jsonify(Error="Method not allowed"), 405
 
 # This route:
 # 1. Student follows Group (POST)
-@app.route('/api/follow/<int:groupid>', methods=['POST'])
-def followUsers(groupid):
-    if request.method == "GET":
-        #return StudentController().followGroup(groupid)
-        # TODO: follow Group
-        pass
+@app.route('/api/follow', methods=['POST'])
+def followUsers():
+    if request.method == "POST":
+        return StudentController().followGroup(request.json)
     else:
         return jsonify(Error="Method not allowed"), 405
 
 # This route:
 # 1. Gets all the following Users from specific Users (GET)
 @app.route('/api/follows/<int:groupid>', methods=['GET'])
-def getAllFollowingUsers(userid):
+def getAllFollowingUsers(groupid):
     if request.method == "GET":
-        return StudentController().getAllFollowingUsers(userid)
+        return StudentController().getAllFollowingUsers(groupid)
     else:
         return jsonify(Error="Method not allowed"), 405
 
 # This route:
 # 1. Student unfollows a specific group (POST)
-@app.route('/api/unfollow/<int:userid>/', methods=['POST'])
-def unfollowUser(userid):
+@app.route('/api/unfollow', methods=['POST'])
+def unfollowGroup():
     if request.method == "POST":
-        return StudentController().unfollowUser(request.json, userid)
+        return StudentController().unfollowGroup(request.json)
     else:
         return jsonify(Error="Method not allowed"), 405
 
@@ -115,7 +153,7 @@ def unfollowUser(userid):
 # 1. Group posts a New Announcement (POST)
 # 2. Get all messages posted (GET)
 @app.route('/api/posts', methods=['GET','POST'])
-def postNewMessage():
+def handlePosts():
     if request.method == "POST":
         return MessageController().postNewMessage(request.json)
     elif request.method == "GET":

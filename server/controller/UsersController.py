@@ -1,16 +1,17 @@
 from flask import jsonify
 from server.model.users_DAO import UsersDAO
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class UserController:
     def addNewUser(self, json, role):
         email = json['email']
         password = json['password']
+        hashedPassword = generate_password_hash(password)
         first_name = json['first_name']
         last_name = json['last_name']
         isValidated = False
         dao = UsersDAO()
-        userid = dao.addNewUser(first_name, last_name, email, password, role, isValidated)
+        userid = dao.addNewUser(first_name, last_name, email, hashedPassword, role, isValidated)
         return int(userid)
 
     def getAllUsers(self):
@@ -31,6 +32,17 @@ class UserController:
             result_list.append(obj)
         return jsonify(result_list)
 
+    def loginUser(self, json):
+        print("Logging in...")
+        dao = UsersDAO()
+        email = json['email']
+        print(email)
+        password = json['password']
+        print(password)
+        userid = dao.loginUser(email, password)
+        if userid != 'User authenticated': return userid, 400
+        return userid, 200
+
     def updateUser(self, userid, json):
         email = json['email']
         password = json['password']
@@ -41,7 +53,7 @@ class UserController:
         dao = UsersDAO()
         dao.updateUser(userid, first_name, last_name, email, password, role, isValidated)
         user_result = self.build_user_attr_dict(userid, first_name, last_name, email, password, role, isValidated)
-        return jsonify(user_result), 204
+        return jsonify(user_result), 200
 
     def build_user_map_to_dict(self, row):
         result = {}

@@ -28,9 +28,7 @@ class MessageDAO:
         cursor = self.conn.cursor()
         query = "SELECT * FROM message where postid=%s ;" % (mid)
         cursor.execute(query)
-        result = []
-        for row in cursor:
-            result.append(row)
+        result = cursor.fetchone()
         return result
 
     def getAllMessages(self):
