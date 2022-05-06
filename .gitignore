@@ -2,13 +2,17 @@
 
 /venv/*
 
-/.venv/
+/.venv/*
 
 /node_modules/
 
-/RUMCircle/
+/RUMCircle/*
 
 __pycache__/
 *.py[cod]
 
 **__init__.py
+node_modules
+
+*/.DS_Store
+.DS_Store

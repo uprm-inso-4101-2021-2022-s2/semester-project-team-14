@@ -36,9 +36,12 @@ class UserController:
         print("Logging in...")
         dao = UsersDAO()
         email = json['email']
+        print(email)
         password = json['password']
+        print(password)
         userid = dao.loginUser(email, password)
-        return jsonify(userid), 200
+        if userid != 'User authenticated': return userid, 404
+        return userid, 200
 
     def updateUser(self, userid, json):
         email = json['email']

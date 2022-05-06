@@ -37,13 +37,16 @@ class UsersDAO:
         cursor = self.conn.cursor()
         query = "SELECT * FROM users where email=%s;" 
         cursor.execute(query, (email,))
-        print("Got response")
-        for row in cursor:
-            if(cursor and check_password_hash(row[4], password)):
-                return "User authenticated"
-            else:
-                return "Wrong Password"
-        return "Couldn't be authenticated"
+        row = cursor.fetchone()
+        if row is None:
+            return "No user found"
+        else:
+           for row in cursor:
+               if(cursor and check_password_hash(row[4], password)):
+                   return "User authenticated"
+               else:
+                   return "Wrong Password"
+           return "Couldn't be authenticated"
 
     def getSpecificUser(self, userid):
         cursor = self.conn.cursor()

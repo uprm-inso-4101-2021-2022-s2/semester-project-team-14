@@ -22,6 +22,7 @@ def loginUser():
         try:
             input_json = request.json
             response = UserController().loginUser(input_json)
+            print(response)
             return response
         except:
             return jsonify(Error="Login was not allowed"), 400
