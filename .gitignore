@@ -6,7 +6,7 @@
 
 /node_modules/
 
-/RUMCircle/
+/RUMCircle/*
 
 __pycache__/
 *.py[cod]
